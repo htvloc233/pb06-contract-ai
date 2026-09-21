@@ -1,0 +1,42 @@
+# Đặt file này tại: .github/workflows/ci.yml
+# CI cho PB-06 — kênh bằng chứng theo Delegation #8 / RISK A7:
+# kết quả tính theo artifact của runner này, không theo lời tường thuật của bất kỳ ai (kể cả AI).
+
+name: CI-PB06
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tools
+        run: pip install ruff pytest
+
+      - name: Lint (src + tests)
+        run: ruff check src/ tests/
+
+      - name: Smoke tests (cấu trúc repo + luật cứng .env)
+        run: pytest tests/ -q
+
+  # ── Chỗ để sẵn cho các cổng Wave 1 — bật khi task tương ứng xong ─────────────
+  #
+  # TODO (W1-11 · Sprint 1): job egress-test
+  #   Request tới endpoint NGOÀI whitelist phải bị CHẶN → test pass (DoD-4).
+  #   Đây là cổng fail-closed chạy bằng máy, không phải lời hứa trong tài liệu.
+  #
+  # TODO (W1-05 · Sprint 0): job db-audit
+  #   UPDATE/DELETE trên audit_logs phải bị DB trigger TỪ CHỐI → test pass (DoD-5).
+  #
+  # TODO (W1-13/W1-20 · Sprint 1-2): job validator-test
+  #   D6-a: trường không span khớp verbatim → ROLLBACK toàn transaction.
+  #   D6-b: câu dữ kiện không neo → bị cắt; không đủ nghĩa → insufficient_grounding.
