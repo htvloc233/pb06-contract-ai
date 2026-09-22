@@ -33,6 +33,7 @@
 | DB-17 | Cổng [7] qua sạch lần 3 liên tiếp — kèm chỉnh khái niệm "tối đa bao nhiêu tầng" | PM + AI | L2 | Cổng hiểu [7] | — |
 | DB-18 | D7 repo/CI lật PASS bằng hành vi — PM tự dựng, vượt 4 lỗi thật; AI chặn "tưởng xong" | PM + AI | L3 | Fail-closed + xác minh độc lập | — |
 | DB-19 | D11 lật PASS — DECISION-D11 (5 role + Q1–Q3) duyệt nguyên trạng; lớp 🔴 = 0 | PM | L2 | Luật tiền-đề DOR | — |
+| DB-20 | N6 đạt — câu stack xuất sắc vòng 1; câu độ nhạy 2 vòng, PM bắt nhãn hai mặt `error_detail_ref` → ARCH v1.5 + LOCK | PM | L2 | Cổng hiểu [3] | — |
 
 ---
 
@@ -424,6 +425,25 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-20 — Architecture Review (N6): đạt, kèm một phát hiện độ nhạy và một bài học schema-vs-data
+
+**Câu 1 (stack) — đạt vòng 1, chất lượng cao nhất các cổng tới nay:** cả 3 quyết định bảo vệ đúng cấu trúc *"X thay vì Y, Y thì hỏng Z"*; đắt nhất là cụm **"exact evidence grounding"** cho PostgreSQL-vs-vector-DB — reviewer tự chỉ ra similarity **ngược thiết kế** D6-a (verbatim), scope truy trong 1 hợp đồng, D4 không persist ⇒ không có corpus. Ba chân, tự đứng.
+
+**Câu 2 (độ nhạy) — 2 vòng:**
+
+| Vòng | Trả lời | Chấm |
+|---|---|---|
+| 1 | `field_key` chứa thông tin nhạy | ⛔ Nhầm **cái khoá** với **cái giá trị**: enum 5 tên cột giống nhau mọi hợp đồng — biết `field_key='penalty_clause'` không nói gì về hợp đồng (AC-05-1 trích đủ 6 trường cho mọi HĐ). Gắn Restricted cho metadata vô hại → lạm phát phân loại, nhãn mất khả năng điều khiển hành vi |
+| 2 | **`analysis_jobs.error_detail_ref` nhãn hai mặt "Internal/Confidential"** | ✅ **Trúng** — nhãn không chọn phe ⇒ mỗi dev tự chọn phe hộ (và chọn phe dễ); lọt qua security review đúng như PM lập luận |
+
+**Chốt của Tech Lead (hoàn tất vế "hay" trong đề xuất của PM):** nguyên tắc *nhãn con trỏ đi theo cái nó **mở được**, không theo cái nó trỏ tới* → **Confidential** + 2 design rule (không trả ref ra client; secure log đích tự gác Restricted-capable — không cam kết được thì ref ăn nhãn đích). Vá tại **ARCH v1.5**.
+
+**Hệ quả dây chuyền (G8):** ARCH **Approved** → **API contract LOCKED 2026-09-21** → DoR **D4 ✅ + D5 ✅** → FE được merge code gọi endpoint. Biên bản: `REVIEW-N6-PB06.md`. Lớp 🟠 còn 4: D8 · D9 · D10 · D12.
+
+**Mức L:** `L2` — AI giữ cổng + chấm; PM là reviewer ra phán quyết nội dung. **PM-edit:** **1** (error_detail_ref).
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -449,6 +469,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-17 | DOR v1.0 (18 điều kiện, 7 PASS · 11 FAIL 3 lớp) + luật tiền-đề | PM qua cổng [7] bằng 2 câu trả lời xác nhận thiết kế; hỏi-chỉnh khái niệm "tối đa tầng" | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua hành vi trả lời cổng* | 2026-09-06 |
 | DB-18 | Hướng dẫn + kit repo/CI + quy trình xác minh bằng chứng trước khi lật D7 | PM tự thực thi toàn bộ (human-do), cung cấp bằng chứng; chấp nhận bị chặn "tưởng xong" và hoàn tất | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua hành vi thực thi* | 2026-09-21 |
 | DB-19 | DECISION-D11 (5 role + Q1–Q3, điều kiện re-verify §4) | **PM duyệt nguyên trạng** — phán quyết trực tiếp bằng lời trong phiên | ✅ Duyệt nguyên trạng | 2026-09-21 |
+| DB-20 | Cách chấm 2 câu cổng [3] + chốt nhãn error_detail_ref + LOCK contract | PM là reviewer: trả lời 2 câu, bắt 1 nhãn hai mặt, chấp nhận chốt Confidential + 2 design rule | ✅ Approve with fix — *phán quyết CHỦ ĐỘNG trong vai Tech Lead* | 2026-09-21 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -469,12 +490,12 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 | Chỉ số | Giá trị |
 |---|---|
-| Mục AI-sai / tài-liệu-sai đã bắt | **17** (**4 do PM bắt** — DB-13 ×2 · DB-15 · DB-16 · 1 do tài liệu ngoài — DB-14 · 1 do AI xác minh độc lập bắt "tưởng xong" — DB-18) |
+| Mục AI-sai / tài-liệu-sai đã bắt | **18** (**5 do PM bắt** — DB-13 ×2 · DB-15 · DB-16 · DB-20 · 1 do tài liệu ngoài — DB-14 · 1 do AI bắt "tưởng xong" — DB-18) |
 | Hard-stop đã kích hoạt | **6** (DB-03 · DB-05 ×3 · DB-09 · DB-14) |
 | Lần AI từ chối bịa nội dung | **3** |
 | Quyết định nền bị đảo / mở lại | **2** (D6 tách D6-a/D6-b · A6 mở rộng) |
 | Luật quy trình mới sinh ra | **1** (ghim số phiên bản thượng nguồn — CLAUDE.md §7) |
-| Phiên bản đã đẩy | SCOPE v3.0 → **v3.2** · SPEC v1.0 → **v1.1** · MODULEMAP v1.1 → **v1.2** · ARCH v1.3 → **v1.4** · WBS **v1.1** · EST **v1.1** · RISK **v1.1** · DELEG **v1.1** |
+| Phiên bản đã đẩy | SCOPE v3.0 → **v3.2** · SPEC v1.0 → **v1.1** · MODULEMAP v1.1 → **v1.2** · ARCH v1.3 → **v1.4** · WBS **v1.1** · EST **v1.1** · RISK **v1.1** · DELEG **v1.1** · ARCH v1.4 → **v1.5 Approved+LOCKED** |
 
 ---
 
@@ -498,7 +519,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | Cổng hiểu bước [7] | ✅ Đóng 2026-09-06 — qua sạch lần 3 liên tiếp (DB-17); `DOR` v1.0 hiệu lực, rà mỗi standup |
 | D7 repo/CI | ✅ **PASS 2026-09-21** — bằng hành vi + xác minh độc lập (DB-18); repo: `github.com/htvloc233/pb06-contract-ai` |
 | D11 role mapping | ✅ **PASS 2026-09-21** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19) |
-| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 SẠCH (0 mục)**; 🟠 còn: N6 (solo: tự review ARCH bằng 2 câu cổng [3]) · contract lock (ngay sau N6) · staging · egress spike (D9) · synthetic (D10) · worker option. Mỗi mục lật = một PR vào repo |
+| N6 Architecture Review + contract LOCK | ✅ **PASS 2026-09-21** — PM kiêm Tech Lead qua cổng [3] có chấm (DB-20); ARCH **v1.5 Approved**, §4 **LOCKED**, D4+D5 lật theo G8 |
+| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 4:** D8 staging *(solo: docker-compose local, ghi quyết định như D11)* · D9 egress spike *(0.5 buổi → job `egress-test`)* · D10 synthetic *(AI nháp được — Delegation #13)* · D12 worker *(chốt A/B/C, 15 phút)*. Mỗi mục lật = một PR |
 
 ---
 

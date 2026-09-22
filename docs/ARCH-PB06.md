@@ -1,9 +1,9 @@
 # ARCH-PB06 — Thiết kế kiến trúc kỹ thuật MVP
 ### AI Tóm Tắt & Trích Xuất Hợp Đồng
 
-> **Phiên bản:** 1.4 · **Ngày:** 2026-09-06
+> **Phiên bản:** 1.5 · **Ngày:** 2026-09-21
 > **Input tham chiếu:** `SPEC-PB06.md` **v1.1** (signed off) · `MODULEMAP-PB06.md` **v1.2** · `SCOPE-PB06.md` **v3.2** (signed off)
-> **Trạng thái:** Draft for Architecture Review
+> **Trạng thái:** ✅ **Approved — Architecture Review (N6) đạt 2026-09-21** · *review bởi PM kiêm vai Tech Lead (chế độ solo), qua cổng hiểu [3] có chấm — biên bản: `REVIEW-N6-PB06.md`, hồ sơ: `DEVBOOK` DB-20*
 > **Mục tiêu:** Thiết kế đủ rõ để bắt đầu code MVP: sơ đồ container, data model, API contract, tech stack, mô hình phân quyền.
 
 ---
@@ -12,6 +12,7 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| **1.5** | 2026-09-21 | **Architecture Review (N6) đạt** → trạng thái Approved, **API contract §4 LOCKED**. Vá phát hiện của reviewer (DB-20): `analysis_jobs.error_detail_ref` bỏ nhãn hai mặt "Internal/Confidential" → chốt **Confidential** theo nguyên tắc *nhãn con trỏ đi theo cái nó mở được*, kèm 2 design rule (không trả ref ra client · secure log đích tự gác). |
 | **1.4** | 2026-09-06 | Đồng bộ `SPEC` v1.1 + `MODULEMAP` v1.2 (`DEVBOOK` DB-12). **AD-01 → AD-01b** + bảng mới `analysis_summary_sources` (neo-theo-câu, D6-b) và `analysis_field_items` (đa giá trị ①/đa đoạn ⑤). Enum trạng thái field tách khỏi trạng thái sửa (`grounded/uncertain/not_found` + `is_edited`); nhãn độ tin cậy bỏ `uncertain` (A6 v3.2). Bỏ `failed` khỏi `analysis_results.status`. API: 4.5 `items[]` + summary `status`/`sentences[]`; thêm **4.8b** PATCH summary; 4.3 thêm `pdf_type`; polling timeout theo nhánh (NFR-P2). Chốt thứ tự 6 hàng (UI-owned). `users.display_name` → Confidential. §8 thêm **Slice 1b**. Bỏ Apache PDFBox. |
 | **1.3** | 2026-08-03 | Bản nhận được (văn bản tham chiếu) — viết trên SPEC v1.0 / MODULEMAP v1.1. |
 
@@ -238,7 +239,7 @@ Lưu trạng thái xử lý mỗi lần user bấm phân tích hoặc phân tíc
 | `status` | enum | Internal | `queued`, `processing`, `completed`, `failed`, `blocked` |
 | `error_code` | varchar | Internal | `pdf_unreadable`, `llm_timeout`, `invalid_response`, etc. |
 | `error_message` | text | Internal | Only system-generated sanitized message from controlled enum/template |
-| `error_detail_ref` | varchar | Internal/Confidential | reference to secure log, if needed |
+| `error_detail_ref` | varchar | **Confidential** *(v1.5 — chốt từ nhãn hai mặt, DB-20)* | ID mờ trỏ tới secure log. **Design rule:** ① không bao giờ trả ra client API (4.3 chỉ trả `error_code`); ② secure log đích có kiểm soát truy cập riêng mức Restricted-capable. Không cam kết được ② → ref ăn nhãn của đích |
 | `started_at` | timestamp | Internal | For SLA |
 | `completed_at` | timestamp | Internal | For SLA |
 | `created_at` | timestamp | Internal | Audit support |
@@ -476,6 +477,8 @@ Nói "append-only" ở mức tài liệu là không đủ; phải enforce ở m�
 ---
 
 ## 4. API contract chính
+
+> 🔒 **LOCKED 2026-09-21** (sau N6, theo G8 của `EST`). Từ thời điểm này: FE được merge code gọi endpoint; mọi thay đổi shape request/response = mở lại review + đổi phiên bản ARCH, không sửa lặng lẽ.
 
 ### 4.1 Auth convention
 
