@@ -14,6 +14,7 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| *(cập nhật)* | 2026-09-23 | **D8 lật PASS** — staging phương án B sống trên máy PM (DECISION v1.1 APPROVED, DB-24). Bảng: **15 PASS · 3 FAIL** — cả 3 thuộc lớp 🟡 deadline-riêng. **Lớp 🔴 + 🟠 = 0 → theo luật tiền-đề, BƯỚC [8] BUILD MỞ** |
 | *(cập nhật)* | 2026-09-22 | **D9 lật PASS** — egress guard + 6 test, hai môi trường xanh, cổng sống trong CI (DB-23). Bảng: **14 PASS · 4 FAIL**; 🟠 còn duy nhất **D8** |
 | *(cập nhật)* | 2026-09-22 | **D12 lật PASS** — DECISION-D12 duyệt nguyên trạng: option C + 4 design rule (DB-22). Bảng: **13 PASS · 5 FAIL**; 🟠 còn D8 · D9 |
 | *(cập nhật)* | 2026-09-22 | **D10 lật PASS** — bộ synthetic + answer key, PM review duyệt (DB-21). Bảng: **12 PASS · 6 FAIL**; 🟠 còn D8·D9·D12 |
@@ -42,7 +43,7 @@
 | # | Điều kiện | Trạng thái | Nếu FAIL: giải quyết bằng gì |
 |---|---|:-:|---|
 | D7 | Repo + CI + quyền truy cập đủ cho cả 4 người | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** ① repo public đúng cấu trúc, commit #1 = bộ artefact — `github.com/htvloc233/pb06-contract-ai` *(AI xác minh độc lập)* · ② CI xanh — run `35555468221`, Status **Success**, job lint-test *(AI xác minh độc lập)* · ③ push thẳng `main` bị chặn `GH006 — Changes must be made through a pull request` — hàng rào **từng sập vì (a) Private+Free không enforce**, sửa bằng chuyển Public, kiểm lại bằng cú push cố tình thất bại *(output dán trong phiên)* · ④ vòng PR #1 trọn vẹn — PR + CI xanh trên PR *(AI xác minh)*, cú Merge *(ghi nhận theo tuyên bố PM 2026-09-21; kênh xác minh tự động bị cache/robots chặn — PM tự kiểm README hiển thị trên main)* · ⑤ `.env` chặn bởi `.gitignore` + `test_no_env_committed` trong run Success. **Diễn giải solo:** "4 người" theo đội thật — học viên (Coach thêm quyền khi tham gia review). Chi tiết: `DEVBOOK` DB-18 |
-| D8 | Staging sẵn sàng (G5 của EST) | ❌ FAIL *(chưa xác minh)* | BE xác nhận với platform, hạn trong Sprint 0. Chặn: W1-18 ghép slice · W1-22 đo p95 |
+| D8 | Staging sẵn sàng (G5 của EST) | ✅ **PASS** *(2026-09-23)* | **Bằng chứng 3 nguồn:** ① staging phương án B **sống thật trên máy PM** — `curl /health` trả `"status":"ok"` + `psql -d pb06` trả `PostgreSQL 12.3` (output dán trong phiên) · ② CI run `35774436648` **Success trên `main`** = merge PR #8, AI xác minh độc lập · ③ `DECISION-D8-PB06.md` **v1.1 APPROVED** — hai tầng định nghĩa (compose = chuẩn cho CI/máy đủ điều kiện; native venv 3.12 + Postgres.app = thi hành trên máy hiện tại, ràng buộc macOS 10.15.5 ghi minh bạch) + 5 design rule gồm khoanh vùng skew PG12/16. Chi tiết: DB-24 |
 | D9 | Egress control khả thi (tiền đề W1-11) | ✅ **PASS** *(2026-09-22)* | **Bằng chứng 3 mắt xích, xác minh độc lập:** ① guard thật `src/egress_guard.py` (mặc định đóng · chỉ https · không suy subdomain · bị chặn thì transport không bị chạm) — **6/6 test PASS trên máy PM** (Python 3.8, output dán trong phiên) · ② **CI run `35763287927` Success trên `main`** — job `egress-test` xanh (AI fetch xác minh) · ③ run chính là commit merge PR #6 ⇒ **merge đã xác minh**. Cổng DoD-4/B1 từ nay sống trong CI. Hai môi trường 3.8/3.11 cùng xanh. Chi tiết: DB-23 |
 | D10 | Bộ 5 hợp đồng synthetic sẵn (W1-06) — **nhiên liệu hợp pháp duy nhất** khi OI-02 chưa chốt | ✅ **PASS** *(2026-09-22)* | **Bằng chứng:** bộ 5 PDF text-layer (máy kiểm word-offset + mọi giá trị answer key khớp verbatim) + `MANIFEST-SYNTH-PB06.md` v1.0 (answer key = mini gold set) + `gen_synth.py` tái lập được ⇒ chứng minh giả 100%. AI-draft (Delegation #13, L2), **PM review checklist §4 và duyệt** *(tuyên bố trong phiên)*. HD-04 19 trang thoả luôn DoR-1b B2. Chi tiết: DB-21 |
 
@@ -77,7 +78,7 @@
 | Lớp | Mục | Ý nghĩa |
 |---|---|---|
 | 🔴 **Chặn ngày-1** | ~~D7~~ ✅ · ~~D11~~ ✅ *(cả hai PASS 2026-09-21 — DB-18 · DB-19)* | **Lớp 🔴 SẠCH** — task code đầu tiên (W1-02 L0-Auth resolver) đủ điều kiện start theo luật tiền-đề |
-| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ · ~~D9~~ ✅ · ~~D10~~ ✅ · ~~D12~~ ✅ *(DB-20 → DB-23)* · **D8** | Còn **1 mục cuối cùng: staging** |
+| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ · ~~D8~~ ✅ · ~~D9~~ ✅ · ~~D10~~ ✅ · ~~D12~~ ✅ | **SẠCH TOÀN PHẦN** *(DB-20 → DB-24)* |
 | 🟡 **Không chặn slice — deadline riêng** | D13 · D15 · D16 · owner risk | Slice chạy được mà không có chúng, **nhưng Wave 2 thì không** — để trễ là mượn nợ của chính mình ba tuần sau |
 
 ---
@@ -85,6 +86,8 @@
 ## 3. Kết luận DoR
 
 **Slice 1 hôm nay: CHƯA READY.** Và đó là câu trả lời đúng — DoR tồn tại để 11 cái FAIL này **hiện hình trước dòng code đầu tiên**, thay vì hiện hình ở tuần 3 dưới dạng "ơ, tưởng có staging rồi".
+
+> ✅ **Cập nhật 2026-09-23 — SLICE 1 READY.** 11 FAIL ban đầu: 8 đã lật PASS bằng hành động + bằng chứng (D7 → D12, hồ sơ DB-18 → DB-24); 3 còn lại (D13 · D15 · D16) thuộc lớp 🟡 deadline-riêng, **không chặn build**. Luật tiền-đề tự vận hành: **bước [8] BUILD MỞ** — task code đầu tiên đủ điều kiện là **W1-02** (L0-Auth resolver, đặc tả từ DECISION-D11).
 
 **Đủ điều kiện KHỞI ĐỘNG Sprint 0** theo **luật tiền-đề** (fail-closed áp vào lịch):
 

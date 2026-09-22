@@ -37,6 +37,7 @@
 | DB-21 | D10 lật PASS — bộ 5 HĐ synthetic + answer key; máy tự kiểm bắt HD-04 hụt trang (7→19) | AI + PM | L2 | Delegation #13 review | — |
 | DB-22 | D12 lật PASS — worker chốt option C + 4 design rule; B tự loại trong solo | PM | L2 | Quyết định N5 | — |
 | DB-23 | D9 lật PASS — egress guard sống trong CI; PM tự gửi bằng chứng post-merge (bài DB-18 tự vận hành) | PM + AI | L3 | Cổng máy DoD-4 | — |
+| DB-24 | D8 lật PASS — Docker bị chặn bởi macOS 10.15.5 → amend quyết định sang đường B native; DoR 🔴🟠 sạch, **bước [8] MỞ** | PM + AI | L3 | Luật tiền-đề DOR | — |
 
 ---
 
@@ -487,6 +488,20 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-24 — D8 lật PASS bằng đường vòng có hồ sơ: ràng buộc thật → sửa quyết định, không ép công cụ
+
+**Diễn biến:** kit docker-compose giao xong thì thực tế lên tiếng — máy PM chạy **macOS 10.15.5**, Docker Desktop đòi 14+. AI tra cứu xác minh: các bản cũ tương thích Catalina **không còn link tải chính thức** → từ chối đường "tải bản trôi nổi không vá lên máy đang giữ credential" (đúng RISK B1/kỷ luật an ninh). Thay vào đó: **amend DECISION-D8 → v1.1** theo đúng §4 điều-kiện-mở-lại — hai tầng định nghĩa (compose = chuẩn cho CI/máy đủ điều kiện, giữ trong repo; native = thi hành trên máy hiện tại) + design rule 5 khoanh vùng skew PG12/16 (migration Wave 1 chỉ dùng tính năng cổ điển).
+
+**PM thực thi đường B:** cài Python 3.12 (python.org) + Postgres.app PG 12.3 (bản build cho Catalina) → `./staging-up.sh` (AI đã tự kiểm chạy thật trước khi giao) → staging **sống**: `/health` trả `ok`, `psql -d pb06` trả `PostgreSQL 12.3`.
+
+**Khoảnh khắc đáng ghi nhất — phản xạ luật cứng #2:** thấy chuỗi "env" trong `git status`, PM **dừng tay và hỏi** thay vì `git add -A` theo quán tính. Thực tế là `.env.example` (template, phải commit) chứ không phải `.env` (secret, bị `.gitignore` chặn chủ động — kiểm bằng `git check-ignore`) — nhưng *phản xạ dừng-khi-nghi* chính là thứ luật cứng tồn tại để tạo ra, và thà chặn nhầm một câu hỏi còn hơn lọt một secret vào lịch sử git vĩnh viễn.
+
+**Bằng chứng 3 nguồn:** output staging (phiên) · CI run `35774436648` Success trên `main` = merge PR #8 (AI xác minh độc lập — lần 2 liên tiếp PM tự gửi bằng chứng post-merge) · DECISION v1.1 duyệt nguyên trạng.
+
+**Hệ quả:** D8 ✅ · **DOR 15 PASS · 3 FAIL (toàn 🟡 deadline-riêng)** · lớp 🔴 + 🟠 = 0 → **luật tiền-đề tự mở BƯỚC [8] BUILD** — không ai "quyết định cho qua", hệ thống tự mở vì điều kiện đủ. **Mức L:** `L3`.
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -516,6 +531,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-21 | Bộ 5 HĐ synthetic + answer key + gen_synth.py | **PM review theo checklist §4** và duyệt: "các HĐ nháp ổn" | ✅ Duyệt — *phán quyết chủ động qua review Delegation #13* | 2026-09-22 |
 | DB-22 | DECISION-D12 (option C + 4 design rule, trigger nâng A đo được) | **PM duyệt nguyên trạng** — phán quyết trực tiếp trong phiên | ✅ Duyệt nguyên trạng | 2026-09-22 |
 | DB-23 | Egress guard + 6 test + job CI | **PM chạy local 6/6, tự đẩy PR #6, gửi bằng chứng post-merge** | ✅ Chấp nhận — *phán quyết chủ động qua thực thi + cung cấp bằng chứng đúng chuẩn* | 2026-09-22 |
+| DB-24 | DECISION-D8 v1.1 (đường B native) + kit staging + xử lý ràng buộc macOS | **PM duyệt nguyên trạng, tự cài + chạy + cung cấp đủ 3 nguồn bằng chứng** | ✅ Duyệt nguyên trạng | 2026-09-23 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -569,7 +585,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | D10 synthetic + answer key | ✅ **PASS 2026-09-22** — 5 PDF máy-kiểm verbatim + mini gold set + generator tái lập; PM review duyệt (DB-21) |
 | D12 worker option | ✅ **PASS 2026-09-22** — `DECISION-D12-PB06.md` APPROVED: option C + 4 design rule (DB-22) |
 | D9 egress spike | ✅ **PASS 2026-09-22** — guard + 6 test hai môi trường xanh; run `35763287927` Success trên main, merge PR #6 xác minh (DB-23) |
-| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn DUY NHẤT D8 staging** *(AI nháp docker-compose + bản quyết định kiểu D11, PM duyệt và chạy `docker compose up` lần đầu)*. Lật nốt là cửa [8] mở |
+| D8 staging | ✅ **PASS 2026-09-23** — đường B native sống trên máy PM (PG 12.3 + venv 3.12); run `35774436648` Success = merge PR #8; DECISION v1.1 APPROVED (DB-24) |
+| **Vào bước [8] BUILD** | 🔓 **MỞ — 2026-09-23, theo luật tiền-đề** (không ai "quyết cho qua"; điều kiện đủ nên hệ thống tự mở). DOR 15 PASS · 3 FAIL toàn 🟡 deadline-riêng (OI-01 · OI-02 · owner gold set thật). Tier-2 PM-stack: prototype + API mock theo contract **LOCKED** + schema + test scenario — **mock bắt buộc chứa ca `not_found` và `insufficient_grounding`**. Task code đầu tiên đủ điều kiện: **W1-02** (L0-Auth resolver theo DECISION-D11) |
 
 ---
 
