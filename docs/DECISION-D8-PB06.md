@@ -1,7 +1,7 @@
 # DECISION-D8-PB06 — Chốt định nghĩa Staging (chế độ solo)
 ### Quyết định một trang · lật điều kiện DoR **D8** (G5/G8 của EST)
 
-> **Phiên bản:** 1.1 · **Ngày:** 2026-09-23 · **Trạng thái:** `draft_ai` — **chờ PM duyệt + bằng chứng chạy**
+> **Phiên bản:** 1.1 · **Ngày:** 2026-09-23 · **Trạng thái:** ✅ **APPROVED** — PM duyệt nguyên trạng 2026-09-23, bằng chứng chạy đủ 3 ô *(hồ sơ: `DEVBOOK` DB-24)*
 > **v1.1 — sửa theo ràng buộc phần cứng thật:** máy PM chạy macOS 10.15.5; Docker Desktop hiện hành đòi macOS 14+, các bản cũ tương thích Catalina **không còn link tải chính thức** → thi hành staging trên máy này chuyển sang **phương án B (native)**. Đúng tinh thần §4 của mọi DECISION: quyết định gặp thực tế thì sửa quyết định có hồ sơ — không ép công cụ, không cài bản không được vá lên máy đang giữ credential
 > **Input:** `DOR` D8 · `EST` v1.1 G5/G8 · `ARCH` v1.5 §2 (container) · `DECISION-D12` (worker C chạy trong AI service) · tiền lệ D11/D12 (vai kiêm minh bạch)
 > **Người quyết:** PM kiêm vai hạ tầng *(solo — không có team platform; quyết định này thay cho "staging của tổ chức tồn tại")*
@@ -46,4 +46,4 @@ Cắm SaaS thật → staging thật của tổ chức họ, compose này giáng
 
 ---
 
-**✍️ Phán quyết của PM:** ⬜ Duyệt nguyên trạng (compose 2 container + 4 design rule) · ⬜ Duyệt có chỉnh · ⬜ Bác — *Ngày / ký:* ____________
+**✍️ Phán quyết của PM:** ☑ **Duyệt nguyên trạng** *(v1.1 — hai tầng định nghĩa + 5 design rule)* · ⬜ Duyệt có chỉnh · ⬜ Bác — *Ngày:* **2026-09-23** *(tuyên bố trong phiên — ký tay khi in hồ sơ viva)*
