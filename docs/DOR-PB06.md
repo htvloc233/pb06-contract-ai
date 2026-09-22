@@ -14,6 +14,7 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| *(cập nhật)* | 2026-09-22 | **D10 lật PASS** — bộ synthetic + answer key, PM review duyệt (DB-21). Bảng: **12 PASS · 6 FAIL**; 🟠 còn D8·D9·D12 |
 | *(cập nhật)* | 2026-09-21 | **D4 + D5 lật PASS** — N6 đạt (PM kiêm Tech Lead, cổng [3] có chấm, DB-20) → contract LOCK theo G8. Bảng: **11 PASS · 7 FAIL**; 🟠 còn D8·D9·D10·D12 |
 | *(cập nhật)* | 2026-09-21 | **D11 lật PASS** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19). **Lớp 🔴 = 0**. Bảng: **9 PASS · 9 FAIL** |
 | *(cập nhật)* | 2026-09-21 | **D7 lật FAIL → PASS** bằng hành vi + bằng chứng xác minh (repo/CI/hàng rào/PR — DB-18). Lớp 🔴 còn **D11**. Bảng: 8 PASS · 10 FAIL |
@@ -41,7 +42,7 @@
 | D7 | Repo + CI + quyền truy cập đủ cho cả 4 người | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** ① repo public đúng cấu trúc, commit #1 = bộ artefact — `github.com/htvloc233/pb06-contract-ai` *(AI xác minh độc lập)* · ② CI xanh — run `35555468221`, Status **Success**, job lint-test *(AI xác minh độc lập)* · ③ push thẳng `main` bị chặn `GH006 — Changes must be made through a pull request` — hàng rào **từng sập vì (a) Private+Free không enforce**, sửa bằng chuyển Public, kiểm lại bằng cú push cố tình thất bại *(output dán trong phiên)* · ④ vòng PR #1 trọn vẹn — PR + CI xanh trên PR *(AI xác minh)*, cú Merge *(ghi nhận theo tuyên bố PM 2026-09-21; kênh xác minh tự động bị cache/robots chặn — PM tự kiểm README hiển thị trên main)* · ⑤ `.env` chặn bởi `.gitignore` + `test_no_env_committed` trong run Success. **Diễn giải solo:** "4 người" theo đội thật — học viên (Coach thêm quyền khi tham gia review). Chi tiết: `DEVBOOK` DB-18 |
 | D8 | Staging sẵn sàng (G5 của EST) | ❌ FAIL *(chưa xác minh)* | BE xác nhận với platform, hạn trong Sprint 0. Chặn: W1-18 ghép slice · W1-22 đo p95 |
 | D9 | Egress control khả thi trên hạ tầng SaaS (tiền đề W1-11) | ❌ FAIL *(chưa xác minh)* | BE spike nửa buổi Sprint 0. Chặn: W1-11; nếu hạ tầng không cho app-level egress → đuôi P của W1-11 kích hoạt |
-| D10 | Bộ 5 hợp đồng synthetic sẵn (W1-06) — **nhiên liệu hợp pháp duy nhất** khi OI-02 chưa chốt | ❌ FAIL | PM soạn tuần 1 (0.5d). Chặn: W1-12 trở đi (mọi việc cho model ăn dữ liệu) |
+| D10 | Bộ 5 hợp đồng synthetic sẵn (W1-06) — **nhiên liệu hợp pháp duy nhất** khi OI-02 chưa chốt | ✅ **PASS** *(2026-09-22)* | **Bằng chứng:** bộ 5 PDF text-layer (máy kiểm word-offset + mọi giá trị answer key khớp verbatim) + `MANIFEST-SYNTH-PB06.md` v1.0 (answer key = mini gold set) + `gen_synth.py` tái lập được ⇒ chứng minh giả 100%. AI-draft (Delegation #13, L2), **PM review checklist §4 và duyệt** *(tuyên bố trong phiên)*. HD-04 19 trang thoả luôn DoR-1b B2. Chi tiết: DB-21 |
 
 ### C. Con người & quyết định
 
@@ -74,7 +75,7 @@
 | Lớp | Mục | Ý nghĩa |
 |---|---|---|
 | 🔴 **Chặn ngày-1** | ~~D7~~ ✅ · ~~D11~~ ✅ *(cả hai PASS 2026-09-21 — DB-18 · DB-19)* | **Lớp 🔴 SẠCH** — task code đầu tiên (W1-02 L0-Auth resolver) đủ điều kiện start theo luật tiền-đề |
-| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ *(2026-09-21 — DB-20)* · D8 · D9 · D10 · D12 | Còn 4 mục, mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
+| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ · ~~D10~~ ✅ *(DB-20 · DB-21)* · **D8 · D9 · D12** | Còn 3 mục, mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
 | 🟡 **Không chặn slice — deadline riêng** | D13 · D15 · D16 · owner risk | Slice chạy được mà không có chúng, **nhưng Wave 2 thì không** — để trễ là mượn nợ của chính mình ba tuần sau |
 
 ---
@@ -96,7 +97,7 @@ Nhịp cập nhật: bảng này rà lại **mỗi standup Sprint 0** cho tới 
 | # | Điều kiện | Vì sao |
 |---|---|---|
 | B1 | Slice 1 **xanh end-to-end trên staging** (W1-18) | 1b đo trên nền 1 — đo trên nền lung lay là số rác |
-| B2 | Bộ synthetic có **≥1 hợp đồng ~20 trang** đúng chuẩn đo (điều kiện của DoD-1 p95) | Không có thì phép đo W1-22 không so được với ngưỡng 30s |
+| B2 | Bộ synthetic có **≥1 hợp đồng ~20 trang** đúng chuẩn đo (điều kiện của DoD-1 p95) | ✅ Thoả bởi `HD-04` (19 trang, bảng 120 hạng mục + 3 phụ lục) — xem D10 | 
 | B3 | Đòn bẩy T1 (200→120 từ) còn nguyên hiệu lực, người quyết có mặt khi đo | Đo xong phải quyết ngay và ghi Dev Book — số để qua đêm là số nguội |
 
 ---
