@@ -34,6 +34,7 @@
 | DB-18 | D7 repo/CI lật PASS bằng hành vi — PM tự dựng, vượt 4 lỗi thật; AI chặn "tưởng xong" | PM + AI | L3 | Fail-closed + xác minh độc lập | — |
 | DB-19 | D11 lật PASS — DECISION-D11 (5 role + Q1–Q3) duyệt nguyên trạng; lớp 🔴 = 0 | PM | L2 | Luật tiền-đề DOR | — |
 | DB-20 | N6 đạt — câu stack xuất sắc vòng 1; câu độ nhạy 2 vòng, PM bắt nhãn hai mặt `error_detail_ref` → ARCH v1.5 + LOCK | PM | L2 | Cổng hiểu [3] | — |
+| DB-21 | D10 lật PASS — bộ 5 HĐ synthetic + answer key; máy tự kiểm bắt HD-04 hụt trang (7→19) | AI + PM | L2 | Delegation #13 review | — |
 
 ---
 
@@ -444,6 +445,18 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-21 — Bộ synthetic + answer key: D10 lật PASS qua đúng vòng review Delegation #13
+
+**AI nháp (L2):** 5 hợp đồng thiết kế theo **4 lớp kiểm** — happy-path (HD-01) · đa giá trị 4 bên + phạt rải 3 điều (HD-02) · **bẫy trạng thái**: không ngày hết hạn → `not_found`, 3 số tiền cạnh tranh → `uncertain` (HD-03) · chuẩn đo 19 trang (HD-04) · song ngữ + USD (HD-05). Kèm **answer key** (`MANIFEST-SYNTH-PB06.md`) = mini gold set cho validator W1-13/W1-20, và `gen_synth.py` — **tái lập được ⇒ chứng minh dữ liệu giả 100%** thay vì cam đoan miệng. Noise cố ý ghi thành văn (tên xuống dòng, footer marker lặp — kèm bài kiểm ngầm: marker không được lọt vào tóm tắt).
+
+**Máy tự kiểm trước khi trình người:** pdfplumber xác nhận text-layer + word-offset; mọi giá trị answer key khớp **verbatim** trong PDF (grounding của chính nhiên liệu); và chính vòng kiểm này **bắt HD-04 hụt chuẩn** — 7 trang ở bản đầu, phình hai vòng lên 19. AI-sai-máy-bắt trước khi tới tay PM.
+
+**PM review (checklist §4 manifest):** duyệt — *"các HĐ nháp ổn"* (tuyên bố trong phiên). **Kết quả:** D10 ✅ · DoR-1b B2 thoả luôn (HD-04) · bảng DOR **12 PASS · 6 FAIL** · 🟠 còn D8 · D9 · D12.
+
+**Mức L:** `L2` — AI-draft, PM là người duyệt nội dung + xác nhận không dữ liệu thật (đúng lý do dòng #13 giữ ở draft).
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -470,6 +483,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-18 | Hướng dẫn + kit repo/CI + quy trình xác minh bằng chứng trước khi lật D7 | PM tự thực thi toàn bộ (human-do), cung cấp bằng chứng; chấp nhận bị chặn "tưởng xong" và hoàn tất | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua hành vi thực thi* | 2026-09-21 |
 | DB-19 | DECISION-D11 (5 role + Q1–Q3, điều kiện re-verify §4) | **PM duyệt nguyên trạng** — phán quyết trực tiếp bằng lời trong phiên | ✅ Duyệt nguyên trạng | 2026-09-21 |
 | DB-20 | Cách chấm 2 câu cổng [3] + chốt nhãn error_detail_ref + LOCK contract | PM là reviewer: trả lời 2 câu, bắt 1 nhãn hai mặt, chấp nhận chốt Confidential + 2 design rule | ✅ Approve with fix — *phán quyết CHỦ ĐỘNG trong vai Tech Lead* | 2026-09-21 |
+| DB-21 | Bộ 5 HĐ synthetic + answer key + gen_synth.py | **PM review theo checklist §4** và duyệt: "các HĐ nháp ổn" | ✅ Duyệt — *phán quyết chủ động qua review Delegation #13* | 2026-09-22 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -520,7 +534,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | D7 repo/CI | ✅ **PASS 2026-09-21** — bằng hành vi + xác minh độc lập (DB-18); repo: `github.com/htvloc233/pb06-contract-ai` |
 | D11 role mapping | ✅ **PASS 2026-09-21** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19) |
 | N6 Architecture Review + contract LOCK | ✅ **PASS 2026-09-21** — PM kiêm Tech Lead qua cổng [3] có chấm (DB-20); ARCH **v1.5 Approved**, §4 **LOCKED**, D4+D5 lật theo G8 |
-| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 4:** D8 staging *(solo: docker-compose local, ghi quyết định như D11)* · D9 egress spike *(0.5 buổi → job `egress-test`)* · D10 synthetic *(AI nháp được — Delegation #13)* · D12 worker *(chốt A/B/C, 15 phút)*. Mỗi mục lật = một PR |
+| D10 synthetic + answer key | ✅ **PASS 2026-09-22** — 5 PDF máy-kiểm verbatim + mini gold set + generator tái lập; PM review duyệt (DB-21) |
+| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 3:** D8 staging *(solo: docker-compose local, ghi quyết định như D11)* · D9 egress spike *(0.5 buổi → job `egress-test`)* · D12 worker *(chốt A/B/C, 15 phút)*. Mỗi mục lật = một PR |
 
 ---
 
