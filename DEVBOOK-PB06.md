@@ -31,6 +31,8 @@
 | DB-15 | Cổng [5] qua sạch — PM bác trúng W1-03 (giả định xích N6 chưa định giá) → EST v1.1 | PM | L2 | Cổng hiểu [5] | — |
 | DB-16 | Cổng [6] qua sạch — PM bắt dòng #8 thiếu kênh bằng chứng ("passed ảo") → DELEG v1.1 + RISK A7 | PM | L2 | Cổng hiểu [6] | — |
 | DB-17 | Cổng [7] qua sạch lần 3 liên tiếp — kèm chỉnh khái niệm "tối đa bao nhiêu tầng" | PM + AI | L2 | Cổng hiểu [7] | — |
+| DB-18 | D7 repo/CI lật PASS bằng hành vi — PM tự dựng, vượt 4 lỗi thật; AI chặn "tưởng xong" | PM + AI | L3 | Fail-closed + xác minh độc lập | — |
+| DB-19 | D11 lật PASS — DECISION-D11 (5 role + Q1–Q3) duyệt nguyên trạng; lớp 🔴 = 0 | PM | L2 | Luật tiền-đề DOR | — |
 
 ---
 
@@ -389,6 +391,39 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-18 — D7 (repo/CI) lật PASS bằng hành vi: PM tự tay dựng hạ tầng đầu tiên
+
+**Diễn biến (2026-09-20 → 21):** PM chưa từng dùng terminal/git — hỏi từ *"làm sao mở bash"* — và trong ~2 buổi tự tay: mở Terminal macOS → cài git → clone → giải nén kit 22 file → commit → push → bật branch protection → chạy vòng PR. AI cung cấp hướng dẫn + `pb06-repo-kit.zip` + gỡ lỗi theo từng output dán nguyên văn; **mọi thao tác credential là human-do đúng Delegation #11** (PAT tự tạo tự giữ, không dán vào chat).
+
+**Bốn lỗi thật đã vượt — học liệu troubleshooting:**
+
+| # | Lỗi | Nguyên nhân → xử |
+|---|---|---|
+| 1 | `Password authentication is not supported` | Dùng mật khẩu thay PAT → xoá keychain, tạo token classic scope `repo` |
+| 2 | `src refspec main does not match any` | Chưa commit/nhánh chưa tên `main` → `git branch -M main` |
+| 3 | `refusing PAT to update workflow ... without workflow scope` | Cổng least-privilege của GitHub từ chối đúng — thêm scope `workflow` |
+| 4 | **Hàng rào sập:** push thẳng `main` đi lọt | **(a) Private + gói Free không enforce rule** → chuyển Public → kiểm lại: `GH006 remote rejected` ✅ — chuỗi *sập → truy (a) → sửa → kiểm* là bằng chứng mạnh hơn "đã bật từ đầu" |
+
+**Khoảnh khắc fail-closed đáng ghi nhất:** PM gửi URL + link CI xanh, coi như xong. AI **xác minh độc lập** trước khi lật: phát hiện **PR #1 đang MỞ chưa merge** (main chưa có README, tab PR đếm 1) → 4/5 ô → **từ chối lật sớm**. PM merge nốt → kênh xác minh tự động cạn (trang repo trả cache, commits bị robots chặn) → ô ④ ghi nhận theo tuyên bố PM kèm chú thích nguồn gốc rõ ràng. *"Tưởng xong" bị bắt bởi máy kiểm, không phải bởi lòng tin.*
+
+**Kết quả:** D7 ✅ PASS (bảng DOR có dòng bằng chứng đầy đủ) · lớp 🔴 còn **D11** · repo public `htvloc233/pb06-contract-ai` giờ là bản sao có version-control của toàn bộ hồ sơ — luật ghim phiên bản từ nay kiểm bằng `git log`.
+
+**Mức L:** `L3` — AI hướng dẫn, đóng kit, xác minh; người thực thi và giữ credential. **Ai bắt ai:** AI bắt PM 1 lần ("tưởng xong"); GitHub bắt PM 2 lần (scope, protection) — cổng của hệ sinh thái cũng là cổng.
+
+---
+
+## DB-19 — D11 lật PASS: quyết định role mapping duyệt nguyên trạng, lớp 🔴 về 0
+
+**Bối cảnh (N1):** ARCH 6.3 để mapping ở dạng *ví dụ, cần xác nhận team SaaS*. Chế độ solo không có team SaaS thật → PM quyết với tư cách **product owner của kịch bản**, ghi minh bạch trong chính văn bản kèm **điều kiện re-verify** khi cắm SaaS thật (§4) — thay thế có kiểm soát, không lặng lẽ bỏ bước.
+
+**Nội dung chốt:** 5 role (`contract_owner/editor/viewer` per-contract · `pm_admin` toàn cục · `system:ai_service`) + 3 quyết định con ARCH để mở: **Q1** quyền gắn theo từng hợp đồng (chọn ca *chặt hơn* — nới xuống rẻ, siết lên đắt) · **Q2** upload = owner/editor, viewer 403 · **Q3** approve thuộc `write`, không tách trong MVP (tách = permission mới = chạm scope).
+
+**Phán quyết:** PM **duyệt nguyên trạng** (tuyên bố trong phiên 2026-09-21). **Hệ quả:** D11 ✅ · W1-01 hoàn thành · W1-02 đủ điều kiện start · **lớp 🔴 của DoR = 0** — khoảng cách tới bước [8] chỉ còn các mục 🟠.
+
+**Mức L:** `L2` — AI soạn văn bản quyết định, PM phán quyết nội dung.
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -412,6 +447,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-15 | EST v1.0 + cách chấm cổng [5] | PM trả lời 2 vế; bác W1-03 được chấp nhận → v1.1 | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG: bác W1-03 là review mạnh nhất có thể có; xác nhận lại trong phiên* | 2026-09-06 |
 | DB-16 | RISK v1.0 + DELEGATION-MAP v1.0 + cách xử lý phát hiện #8 | PM trả lời 2 vế cổng [6]; phát hiện #8 được chấp nhận, xử bằng đổi kênh bằng chứng (giữ L4) | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua chính hành vi bắt lỗi tại cổng* | 2026-09-06 |
 | DB-17 | DOR v1.0 (18 điều kiện, 7 PASS · 11 FAIL 3 lớp) + luật tiền-đề | PM qua cổng [7] bằng 2 câu trả lời xác nhận thiết kế; hỏi-chỉnh khái niệm "tối đa tầng" | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua hành vi trả lời cổng* | 2026-09-06 |
+| DB-18 | Hướng dẫn + kit repo/CI + quy trình xác minh bằng chứng trước khi lật D7 | PM tự thực thi toàn bộ (human-do), cung cấp bằng chứng; chấp nhận bị chặn "tưởng xong" và hoàn tất | ✅ Chấp nhận — *phán quyết CHỦ ĐỘNG qua hành vi thực thi* | 2026-09-21 |
+| DB-19 | DECISION-D11 (5 role + Q1–Q3, điều kiện re-verify §4) | **PM duyệt nguyên trạng** — phán quyết trực tiếp bằng lời trong phiên | ✅ Duyệt nguyên trạng | 2026-09-21 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -432,7 +469,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 | Chỉ số | Giá trị |
 |---|---|
-| Mục AI-sai / tài-liệu-sai đã bắt | **16** (**4 do PM bắt** — DB-13 ×2 · DB-15 · DB-16 · 1 do tài liệu ngoài — DB-14) |
+| Mục AI-sai / tài-liệu-sai đã bắt | **17** (**4 do PM bắt** — DB-13 ×2 · DB-15 · DB-16 · 1 do tài liệu ngoài — DB-14 · 1 do AI xác minh độc lập bắt "tưởng xong" — DB-18) |
 | Hard-stop đã kích hoạt | **6** (DB-03 · DB-05 ×3 · DB-09 · DB-14) |
 | Lần AI từ chối bịa nội dung | **3** |
 | Quyết định nền bị đảo / mở lại | **2** (D6 tách D6-a/D6-b · A6 mở rộng) |
@@ -459,7 +496,9 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | Cổng hiểu bước [6] | ✅ Đóng 2026-09-06 — qua sạch; PM bắt #8 "passed ảo" → DELEG v1.1 + RISK A7 (DB-16) |
 | Vào bước [7] Definition of Ready | 🔓 **MỞ** — input: toàn bộ artefact [0]→[6] đã có hiệu lực (trừ ARCH chờ N6) |
 | Cổng hiểu bước [7] | ✅ Đóng 2026-09-06 — qua sạch lần 3 liên tiếp (DB-17); `DOR` v1.0 hiệu lực, rà mỗi standup |
-| Vào bước [8] BUILD | 🔒 **Khoá theo chính luật tiền-đề của DOR** — mở khi lớp 🔴 (D7 repo/CI · D11 role names) và 🟠 (N6 · contract lock · staging · egress spike · synthetic · worker) lật PASS. Đường ray giấy [0]→[7] ĐỦ; phần còn lại là hành động ngoài đời |
+| D7 repo/CI | ✅ **PASS 2026-09-21** — bằng hành vi + xác minh độc lập (DB-18); repo: `github.com/htvloc233/pb06-contract-ai` |
+| D11 role mapping | ✅ **PASS 2026-09-21** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19) |
+| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 SẠCH (0 mục)**; 🟠 còn: N6 (solo: tự review ARCH bằng 2 câu cổng [3]) · contract lock (ngay sau N6) · staging · egress spike (D9) · synthetic (D10) · worker option. Mỗi mục lật = một PR vào repo |
 
 ---
 
