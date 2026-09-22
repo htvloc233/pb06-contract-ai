@@ -14,6 +14,7 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| *(cập nhật)* | 2026-09-21 | **D4 + D5 lật PASS** — N6 đạt (PM kiêm Tech Lead, cổng [3] có chấm, DB-20) → contract LOCK theo G8. Bảng: **11 PASS · 7 FAIL**; 🟠 còn D8·D9·D10·D12 |
 | *(cập nhật)* | 2026-09-21 | **D11 lật PASS** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19). **Lớp 🔴 = 0**. Bảng: **9 PASS · 9 FAIL** |
 | *(cập nhật)* | 2026-09-21 | **D7 lật FAIL → PASS** bằng hành vi + bằng chứng xác minh (repo/CI/hàng rào/PR — DB-18). Lớp 🔴 còn **D11**. Bảng: 8 PASS · 10 FAIL |
 | **1.0** | 2026-09-06 | Bản đầu: 18 điều kiện / 5 nhóm — **7 PASS · 11 FAIL**, mỗi FAIL gắn task giải quyết + owner + hạn + phạm vi chặn; phân loại FAIL 3 lớp; DoR riêng cho Slice 1b; kết luận *chưa Ready — đủ điều kiện khởi động Sprint 0 theo luật tiền-đề*. |
@@ -29,8 +30,8 @@
 | D1 | SCOPE v3.2 signed off (D6-a/b + A6) | ✅ PASS | Sign-off 2026-09-06 |
 | D2 | SPEC v1.1 signed off; AC của slice (AC-01-1→3 · AC-03-1/2 · AC-05-3 · AC-15-1a) đọc lên nói được ca nào pass/fail | ✅ PASS | Sign-off 2026-09-06; AC đã qua cổng [1] |
 | D3 | Slice định nghĩa xong + ranh giới thang S3 chốt (không mạ vàng bản mỏng) | ✅ PASS | MODULEMAP v1.2 §7 + WBS v1.1 |
-| D4 | ARCH v1.4 qua **Architecture Review** (N6) | ❌ FAIL | Tech Lead review — hạn Sprint 0–1. Chặn: **D5**. Không chặn: skeleton (W1-03), migration draft (W1-04) — đã tách bởi G8 |
-| D5 | API contract **LOCKED** | ❌ FAIL | Theo D4. Chặn: **FE merge code gọi endpoint** (cổng C4); FE vẫn build local trên spec draft |
+| D4 | ARCH qua **Architecture Review** (N6) | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** review bởi PM kiêm Tech Lead (solo, minh bạch), qua cổng hiểu [3] có chấm — câu stack đạt vòng 1 (blast radius · polling · *exact evidence grounding* vs vector DB), câu độ nhạy đạt vòng 2 (bắt nhãn hai mặt `error_detail_ref`, vá ở **ARCH v1.5**). Biên bản: `REVIEW-N6-PB06.md` · DB-20 |
+| D5 | API contract **LOCKED** | ✅ **PASS** *(2026-09-21)* | LOCK ghi tại ARCH v1.5 §4 (theo G8). FE chính thức được merge code gọi endpoint; đổi shape từ nay = mở lại review |
 | D6 | Kế hoạch + ước lượng hiệu lực (WBS v1.1 · EST v1.1 · trigger T1/T2 chốt sẵn) | ✅ PASS | Cổng [4][5] đã đóng |
 
 ### B. Môi trường & dữ liệu
@@ -73,7 +74,7 @@
 | Lớp | Mục | Ý nghĩa |
 |---|---|---|
 | 🔴 **Chặn ngày-1** | ~~D7~~ ✅ · ~~D11~~ ✅ *(cả hai PASS 2026-09-21 — DB-18 · DB-19)* | **Lớp 🔴 SẠCH** — task code đầu tiên (W1-02 L0-Auth resolver) đủ điều kiện start theo luật tiền-đề |
-| 🟠 **Chặn trong Sprint 0–1** | D4 · D5 · D8 · D9 · D10 · D12 | Có việc khác làm trong lúc chờ; mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
+| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ *(2026-09-21 — DB-20)* · D8 · D9 · D10 · D12 | Còn 4 mục, mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
 | 🟡 **Không chặn slice — deadline riêng** | D13 · D15 · D16 · owner risk | Slice chạy được mà không có chúng, **nhưng Wave 2 thì không** — để trễ là mượn nợ của chính mình ba tuần sau |
 
 ---
