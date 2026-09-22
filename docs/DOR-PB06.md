@@ -14,6 +14,8 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| *(cập nhật)* | 2026-09-21 | **D11 lật PASS** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19). **Lớp 🔴 = 0**. Bảng: **9 PASS · 9 FAIL** |
+| *(cập nhật)* | 2026-09-21 | **D7 lật FAIL → PASS** bằng hành vi + bằng chứng xác minh (repo/CI/hàng rào/PR — DB-18). Lớp 🔴 còn **D11**. Bảng: 8 PASS · 10 FAIL |
 | **1.0** | 2026-09-06 | Bản đầu: 18 điều kiện / 5 nhóm — **7 PASS · 11 FAIL**, mỗi FAIL gắn task giải quyết + owner + hạn + phạm vi chặn; phân loại FAIL 3 lớp; DoR riêng cho Slice 1b; kết luận *chưa Ready — đủ điều kiện khởi động Sprint 0 theo luật tiền-đề*. |
 
 ---
@@ -35,7 +37,7 @@
 
 | # | Điều kiện | Trạng thái | Nếu FAIL: giải quyết bằng gì |
 |---|---|:-:|---|
-| D7 | Repo + CI + quyền truy cập đủ cho cả 4 người | ❌ FAIL *(chưa xác minh)* | BE xác nhận **ngày 1 Sprint 0**. Chặn: mọi task code |
+| D7 | Repo + CI + quyền truy cập đủ cho cả 4 người | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** ① repo public đúng cấu trúc, commit #1 = bộ artefact — `github.com/htvloc233/pb06-contract-ai` *(AI xác minh độc lập)* · ② CI xanh — run `35555468221`, Status **Success**, job lint-test *(AI xác minh độc lập)* · ③ push thẳng `main` bị chặn `GH006 — Changes must be made through a pull request` — hàng rào **từng sập vì (a) Private+Free không enforce**, sửa bằng chuyển Public, kiểm lại bằng cú push cố tình thất bại *(output dán trong phiên)* · ④ vòng PR #1 trọn vẹn — PR + CI xanh trên PR *(AI xác minh)*, cú Merge *(ghi nhận theo tuyên bố PM 2026-09-21; kênh xác minh tự động bị cache/robots chặn — PM tự kiểm README hiển thị trên main)* · ⑤ `.env` chặn bởi `.gitignore` + `test_no_env_committed` trong run Success. **Diễn giải solo:** "4 người" theo đội thật — học viên (Coach thêm quyền khi tham gia review). Chi tiết: `DEVBOOK` DB-18 |
 | D8 | Staging sẵn sàng (G5 của EST) | ❌ FAIL *(chưa xác minh)* | BE xác nhận với platform, hạn trong Sprint 0. Chặn: W1-18 ghép slice · W1-22 đo p95 |
 | D9 | Egress control khả thi trên hạ tầng SaaS (tiền đề W1-11) | ❌ FAIL *(chưa xác minh)* | BE spike nửa buổi Sprint 0. Chặn: W1-11; nếu hạ tầng không cho app-level egress → đuôi P của W1-11 kích hoạt |
 | D10 | Bộ 5 hợp đồng synthetic sẵn (W1-06) — **nhiên liệu hợp pháp duy nhất** khi OI-02 chưa chốt | ❌ FAIL | PM soạn tuần 1 (0.5d). Chặn: W1-12 trở đi (mọi việc cho model ăn dữ liệu) |
@@ -44,7 +46,7 @@
 
 | # | Điều kiện | Trạng thái | Nếu FAIL: giải quyết bằng gì |
 |---|---|:-:|---|
-| D11 | Tên role SaaS thật + mapping permission chốt (N1) | ❌ FAIL | W1-01 — **ngày 1 Sprint 0**, PM+BE. Chặn: W1-02 |
+| D11 | Tên role SaaS thật + mapping permission chốt (N1) | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** `DECISION-D11-PB06.md` v1.0 — 5 role + 3 quyết định con (Q1 quyền per-contract · Q2 upload = owner/editor · Q3 approve ∈ write), **PM duyệt nguyên trạng** (tuyên bố trong phiên; chế độ solo — PM quyết với tư cách product owner kịch bản, điều kiện re-verify khi cắm SaaS thật tại §4 của quyết định). ⇒ W1-01 hoàn thành, W1-02 đủ điều kiện start |
 | D12 | Job worker option chốt (N5) | ❌ FAIL | Tech Lead, hạn Sprint 1. Chặn: W1-14; interface 202+poll bất biến nên FE không chờ |
 | D13 | **Owner gold set có TÊN** (N4) | ❌ FAIL — *nhắc lần 6* | PM chốt với pháp chế tuần 1 (W1-08). **Không chặn Slice 1**; chặn: lịch gán nhãn tuần 2 → dây chuyền F-02 benchmark · F-06 eval · A6/C2 của RISK |
 | D14 | Đội hình giữ nguyên 8 tuần (A7/G3) | ✅ PASS | SCOPE signed; điều kiện mở lại scope nếu vỡ |
@@ -70,7 +72,7 @@
 
 | Lớp | Mục | Ý nghĩa |
 |---|---|---|
-| 🔴 **Chặn ngày-1** | D7 (repo/CI) · D11 (role names) | Chưa xanh thì task code đầu tiên không start. Cả hai có resolving task xếp đúng ngày 1 |
+| 🔴 **Chặn ngày-1** | ~~D7~~ ✅ · ~~D11~~ ✅ *(cả hai PASS 2026-09-21 — DB-18 · DB-19)* | **Lớp 🔴 SẠCH** — task code đầu tiên (W1-02 L0-Auth resolver) đủ điều kiện start theo luật tiền-đề |
 | 🟠 **Chặn trong Sprint 0–1** | D4 · D5 · D8 · D9 · D10 · D12 | Có việc khác làm trong lúc chờ; mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
 | 🟡 **Không chặn slice — deadline riêng** | D13 · D15 · D16 · owner risk | Slice chạy được mà không có chúng, **nhưng Wave 2 thì không** — để trễ là mượn nợ của chính mình ba tuần sau |
 
