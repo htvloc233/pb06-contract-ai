@@ -38,6 +38,8 @@
 | DB-22 | D12 lật PASS — worker chốt option C + 4 design rule; B tự loại trong solo | PM | L2 | Quyết định N5 | — |
 | DB-23 | D9 lật PASS — egress guard sống trong CI; PM tự gửi bằng chứng post-merge (bài DB-18 tự vận hành) | PM + AI | L3 | Cổng máy DoD-4 | — |
 | DB-24 | D8 lật PASS — Docker bị chặn bởi macOS 10.15.5 → amend quyết định sang đường B native; DoR 🔴🟠 sạch, **bước [8] MỞ** | PM + AI | L3 | Luật tiền-đề DOR | — |
+| DB-25 | BUILD W1-02 xong — auth resolver 17 test = ma trận quyền DECISION-D11; dòng code sản phẩm đầu tiên | AI + PM | L3 | Human-review test | — |
+| DB-26 | BUILD W1-04 xong — chu trình A+ trọn vẹn đầu tiên: draft → Duyệt → apply → 6/6 PASS trên PG 12.3 → merge | AI + PM | L1/A+ | Nghi thức A+ | — |
 
 ---
 
@@ -502,6 +504,28 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-25 — BUILD W1-02: dòng code sản phẩm đầu tiên, review bằng cách đọc ma trận test
+
+**Giao (L3, Delegation #6/#7):** `src/auth_resolver.py` — thực thi DECISION-D11 với bảng chân lý **403-vs-404** làm lõi: *biết-tồn-tại-nhưng-thiếu-quyền → 403; không-được-biết-tồn-tại → 404* (viewer trigger → 403 vì đọc được HĐ; viewer chạm draft → 404 vì draft vô hình; không role → 404 toàn tập; pm_admin sửa → 403 dù đọc được — UC-03). `decide_write` gọi `decide_read` trước ⇒ không tồn tại ca lộ thông tin "403 khi sửa thứ đáng lẽ 404 khi xem". Kèm **17 test đặt tên như 17 dòng ma trận quyền tiếng Việt** — thiết kế chủ ý để PM review L3 bằng cách *đọc tên test và phán nó khoá đúng điều đã duyệt*, thay vì đọc implementation.
+
+**Tự kiểm trước giao:** 17/17 + ruff — trong đó **ruff bắt AI một lỗi format import trước khi giao** (cổng của ta chấm cả người dựng cổng), sửa rồi mới đóng gói.
+
+**PM review + bằng chứng:** chạy local 17/17 (output dán trong phiên) · verdict *"Test results OK"* · CI run `35777364385` **Success trên `main`** = merge PR #10 — AI xác minh độc lập, **lần thứ ba liên tiếp PM tự gửi bằng chứng post-merge**. CI đồng thời đã chuyển `lint-test` sang chạy toàn bộ `tests/` — mọi test tương lai tự vào cổng.
+
+**Mức L:** `L3`. Kế tiếp: **W1-04 migration — nghi thức A+** (draft chờ duyệt từng file, PM tự tay apply).
+
+---
+
+## DB-26 — BUILD W1-04: nghi thức A+ chạy trọn chu trình đầu tiên
+
+**Trình tự đã diễn ra đúng từng nhịp thiêng của A+:** AI giao draft (8 bảng ARCH v1.5 §3, PG ≥ 12 theo design rule 5, tự kiểm 6/6 trên PG 16 nội bộ) → PM hỏi *"mở bằng app nào để review"* — tức nghi thức tạo ra đúng hành vi nó muốn: **người dừng lại để đọc SQL trước khi cho chạy** → review theo bản đồ 5 khối → phán quyết chữ **"Duyệt migration 001"** → *chỉ sau đó* apply lên staging → **6/6 PASS trên PG 12.3** → PR #11 → merge (run `35779964027` Success trên `main`, AI xác minh).
+
+**Ba chi tiết đáng giữ:** ① 6 PASS trên PG 12.3 sau khi tự kiểm trên PG 16 = **design rule 5 được chứng minh hai đầu** — SQL cổ điển chạy y hệt trên hai phiên bản cách nhau 4 đời; ② output `DELETE 1`/`DELETE 3` dọn đúng số probe trong khi **dòng audit verify_probe bất khả xâm phạm** — DoD-5 tự chứng minh bằng chính phiên verify; ③ bằng chứng lượt đầu tới dạng PR-run (chưa merge), máy kiểm nhắc như DB-18 — PM merge và gửi post-merge **trong vài phút**: vòng tự-sửa giờ chạy nhanh gần bằng thời gian gõ phím.
+
+**Hệ quả:** schema thành **nền thật** — W1-05 (audit writer + job `db-audit` vào CI) và transaction 8 bước của W1-13 giờ có chỗ đứng. **Mức L:** `L1 + A+` — AI draft, người duyệt-rồi-thi-hành, đúng từng chữ của Delegation #9.
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -532,6 +556,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-22 | DECISION-D12 (option C + 4 design rule, trigger nâng A đo được) | **PM duyệt nguyên trạng** — phán quyết trực tiếp trong phiên | ✅ Duyệt nguyên trạng | 2026-09-22 |
 | DB-23 | Egress guard + 6 test + job CI | **PM chạy local 6/6, tự đẩy PR #6, gửi bằng chứng post-merge** | ✅ Chấp nhận — *phán quyết chủ động qua thực thi + cung cấp bằng chứng đúng chuẩn* | 2026-09-22 |
 | DB-24 | DECISION-D8 v1.1 (đường B native) + kit staging + xử lý ràng buộc macOS | **PM duyệt nguyên trạng, tự cài + chạy + cung cấp đủ 3 nguồn bằng chứng** | ✅ Duyệt nguyên trạng | 2026-09-23 |
+| DB-25 | W1-02 auth resolver + 17 test ma trận quyền | **PM review test, chạy local 17/17, merge PR #10, gửi bằng chứng post-merge** | ✅ "Test results OK" — *review L3 đúng vai* | 2026-09-23 |
+| DB-26 | Migration 001 (8 bảng) + verify 6 khối tự chấm | **PM review SQL rồi phán quyết "Duyệt migration 001", tự apply, dán 6/6 PASS trên PG 12.3, merge PR #11** | ✅ Duyệt migration 001 — *chu trình A+ trọn vẹn* | 2026-09-23 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -586,6 +612,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | D12 worker option | ✅ **PASS 2026-09-22** — `DECISION-D12-PB06.md` APPROVED: option C + 4 design rule (DB-22) |
 | D9 egress spike | ✅ **PASS 2026-09-22** — guard + 6 test hai môi trường xanh; run `35763287927` Success trên main, merge PR #6 xác minh (DB-23) |
 | D8 staging | ✅ **PASS 2026-09-23** — đường B native sống trên máy PM (PG 12.3 + venv 3.12); run `35774436648` Success = merge PR #8; DECISION v1.1 APPROVED (DB-24) |
+| Build W1-02 (L0-Auth resolver) | ✅ **XONG 2026-09-23** — 17/17 test, CI run `35777364385` Success trên main, merge PR #10 (DB-25) |
+| Build W1-04 (Schema 8 bảng, A+) | ✅ **XONG 2026-09-23** — Duyệt → apply → 6/6 PASS trên PG 12.3 → merge PR #11, run `35779964027` (DB-26) |
 | **Vào bước [8] BUILD** | 🔓 **MỞ — 2026-09-23, theo luật tiền-đề** (không ai "quyết cho qua"; điều kiện đủ nên hệ thống tự mở). DOR 15 PASS · 3 FAIL toàn 🟡 deadline-riêng (OI-01 · OI-02 · owner gold set thật). Tier-2 PM-stack: prototype + API mock theo contract **LOCKED** + schema + test scenario — **mock bắt buộc chứa ca `not_found` và `insufficient_grounding`**. Task code đầu tiên đủ điều kiện: **W1-02** (L0-Auth resolver theo DECISION-D11) |
 
 ---
