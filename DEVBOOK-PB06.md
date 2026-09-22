@@ -35,6 +35,7 @@
 | DB-19 | D11 lật PASS — DECISION-D11 (5 role + Q1–Q3) duyệt nguyên trạng; lớp 🔴 = 0 | PM | L2 | Luật tiền-đề DOR | — |
 | DB-20 | N6 đạt — câu stack xuất sắc vòng 1; câu độ nhạy 2 vòng, PM bắt nhãn hai mặt `error_detail_ref` → ARCH v1.5 + LOCK | PM | L2 | Cổng hiểu [3] | — |
 | DB-21 | D10 lật PASS — bộ 5 HĐ synthetic + answer key; máy tự kiểm bắt HD-04 hụt trang (7→19) | AI + PM | L2 | Delegation #13 review | — |
+| DB-22 | D12 lật PASS — worker chốt option C + 4 design rule; B tự loại trong solo | PM | L2 | Quyết định N5 | — |
 
 ---
 
@@ -457,6 +458,20 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-22 — D12 lật PASS: worker chốt option C, được-chọn-rẻ-vì-contract-đã-LOCK
+
+**Bài toán (N5):** ARCH §4.4 để job worker ở [PROPOSAL] với 3 option. Trong bối cảnh solo, **B tự loại trước khi so sánh** — "job framework của SaaS" không có vật tham chiếu khi chưa có SaaS thật; bài toán rút về A (Celery) vs C (BackgroundTasks).
+
+**Quyết định: C cho Wave 1.** Logic cốt lõi: contract `202+poll` đã LOCK ⇒ client không bao giờ biết sau lưng là gì ⇒ nâng cấp C→A là chuyện nội bộ AI service, **đường lui rẻ nên khởi đầu rẻ là hợp lý** — không có bất biến đó thì C là món nợ. Kèm **4 design rule** là điều kiện của chữ duyệt: ① job state sống ở DB, không ở RAM; ② **stale-job sweep** — `processing` >10 phút → `failed` + `error_code='job_timeout'` (bịt ca process chết giữa chừng; nhất quán ARCH: job được phép failed, result thì không); ③ interface/JSON 4.3–4.4 không đổi một ký tự khi thay worker; ④ trigger nâng A **đo được** (song song thật · cần durability · p95 fail vì tuần tự) — cùng triết lý T1/T2.
+
+**Kỷ luật giả định:** EST v1.1 W1-14 từng giả định option A — lệch được **ghi minh bạch** tại DECISION §3, con số giữ nguyên vì C ≤ A (ước lượng cũ thành cận trên), không đẩy version EST vì một dòng.
+
+**Phán quyết:** PM duyệt nguyên trạng *(tuyên bố trong phiên 2026-09-22)*. **Hệ quả:** D12 ✅ · W1-14 hết chặn · [PROPOSAL] ARCH 4.4 đã giải (gộp chú thích vào ARCH ở lần lên version kế) · 🟠 còn **D8 · D9**.
+
+**Mức L:** `L2` — AI trình so sánh + khuyến nghị, PM phán quyết.
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -484,6 +499,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-19 | DECISION-D11 (5 role + Q1–Q3, điều kiện re-verify §4) | **PM duyệt nguyên trạng** — phán quyết trực tiếp bằng lời trong phiên | ✅ Duyệt nguyên trạng | 2026-09-21 |
 | DB-20 | Cách chấm 2 câu cổng [3] + chốt nhãn error_detail_ref + LOCK contract | PM là reviewer: trả lời 2 câu, bắt 1 nhãn hai mặt, chấp nhận chốt Confidential + 2 design rule | ✅ Approve with fix — *phán quyết CHỦ ĐỘNG trong vai Tech Lead* | 2026-09-21 |
 | DB-21 | Bộ 5 HĐ synthetic + answer key + gen_synth.py | **PM review theo checklist §4** và duyệt: "các HĐ nháp ổn" | ✅ Duyệt — *phán quyết chủ động qua review Delegation #13* | 2026-09-22 |
+| DB-22 | DECISION-D12 (option C + 4 design rule, trigger nâng A đo được) | **PM duyệt nguyên trạng** — phán quyết trực tiếp trong phiên | ✅ Duyệt nguyên trạng | 2026-09-22 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -535,7 +551,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | D11 role mapping | ✅ **PASS 2026-09-21** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19) |
 | N6 Architecture Review + contract LOCK | ✅ **PASS 2026-09-21** — PM kiêm Tech Lead qua cổng [3] có chấm (DB-20); ARCH **v1.5 Approved**, §4 **LOCKED**, D4+D5 lật theo G8 |
 | D10 synthetic + answer key | ✅ **PASS 2026-09-22** — 5 PDF máy-kiểm verbatim + mini gold set + generator tái lập; PM review duyệt (DB-21) |
-| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 3:** D8 staging *(solo: docker-compose local, ghi quyết định như D11)* · D9 egress spike *(0.5 buổi → job `egress-test`)* · D12 worker *(chốt A/B/C, 15 phút)*. Mỗi mục lật = một PR |
+| D12 worker option | ✅ **PASS 2026-09-22** — `DECISION-D12-PB06.md` APPROVED: option C + 4 design rule (DB-22) |
+| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 2 ô cuối:** D9 egress spike *(AI soạn test + job CI, PM chạy nửa buổi)* · D8 staging *(AI nháp docker-compose + bản quyết định, PM duyệt)*. Mỗi mục lật = một PR |
 
 ---
 
