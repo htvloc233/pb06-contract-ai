@@ -14,6 +14,7 @@
 
 | Version | Ngày | Nội dung |
 |---|---|---|
+| *(cập nhật)* | 2026-09-22 | **D12 lật PASS** — DECISION-D12 duyệt nguyên trạng: option C + 4 design rule (DB-22). Bảng: **13 PASS · 5 FAIL**; 🟠 còn D8 · D9 |
 | *(cập nhật)* | 2026-09-22 | **D10 lật PASS** — bộ synthetic + answer key, PM review duyệt (DB-21). Bảng: **12 PASS · 6 FAIL**; 🟠 còn D8·D9·D12 |
 | *(cập nhật)* | 2026-09-21 | **D4 + D5 lật PASS** — N6 đạt (PM kiêm Tech Lead, cổng [3] có chấm, DB-20) → contract LOCK theo G8. Bảng: **11 PASS · 7 FAIL**; 🟠 còn D8·D9·D10·D12 |
 | *(cập nhật)* | 2026-09-21 | **D11 lật PASS** — `DECISION-D11-PB06.md` duyệt nguyên trạng (DB-19). **Lớp 🔴 = 0**. Bảng: **9 PASS · 9 FAIL** |
@@ -49,7 +50,7 @@
 | # | Điều kiện | Trạng thái | Nếu FAIL: giải quyết bằng gì |
 |---|---|:-:|---|
 | D11 | Tên role SaaS thật + mapping permission chốt (N1) | ✅ **PASS** *(2026-09-21)* | **Bằng chứng:** `DECISION-D11-PB06.md` v1.0 — 5 role + 3 quyết định con (Q1 quyền per-contract · Q2 upload = owner/editor · Q3 approve ∈ write), **PM duyệt nguyên trạng** (tuyên bố trong phiên; chế độ solo — PM quyết với tư cách product owner kịch bản, điều kiện re-verify khi cắm SaaS thật tại §4 của quyết định). ⇒ W1-01 hoàn thành, W1-02 đủ điều kiện start |
-| D12 | Job worker option chốt (N5) | ❌ FAIL | Tech Lead, hạn Sprint 1. Chặn: W1-14; interface 202+poll bất biến nên FE không chờ |
+| D12 | Job worker option chốt (N5) | ✅ **PASS** *(2026-09-22)* | **Bằng chứng:** `DECISION-D12-PB06.md` v1.0 APPROVED — **option C** (FastAPI BackgroundTasks) + 4 design rule: job state sống ở DB · stale-job sweep 10 phút → `failed` · interface 4.3/4.4 bất biến · trigger nâng cấp A **đo được**. B tự loại trong solo (không có SaaS tham chiếu). PM kiêm Tech Lead duyệt nguyên trạng *(tuyên bố trong phiên)*. ⇒ W1-14 hết chặn; [PROPOSAL] ARCH §4.4 đã giải |
 | D13 | **Owner gold set có TÊN** (N4) | ❌ FAIL — *nhắc lần 6* | PM chốt với pháp chế tuần 1 (W1-08). **Không chặn Slice 1**; chặn: lịch gán nhãn tuần 2 → dây chuyền F-02 benchmark · F-06 eval · A6/C2 của RISK |
 | D14 | Đội hình giữ nguyên 8 tuần (A7/G3) | ✅ PASS | SCOPE signed; điều kiện mở lại scope nếu vỡ |
 
@@ -75,7 +76,7 @@
 | Lớp | Mục | Ý nghĩa |
 |---|---|---|
 | 🔴 **Chặn ngày-1** | ~~D7~~ ✅ · ~~D11~~ ✅ *(cả hai PASS 2026-09-21 — DB-18 · DB-19)* | **Lớp 🔴 SẠCH** — task code đầu tiên (W1-02 L0-Auth resolver) đủ điều kiện start theo luật tiền-đề |
-| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ · ~~D10~~ ✅ *(DB-20 · DB-21)* · **D8 · D9 · D12** | Còn 3 mục, mỗi mục có task + owner + hạn. Quá hạn → escalation N-list, không chờ im lặng |
+| 🟠 **Chặn trong Sprint 0–1** | ~~D4~~ ✅ · ~~D5~~ ✅ · ~~D10~~ ✅ · ~~D12~~ ✅ *(DB-20 → DB-22)* · **D8 · D9** | Còn **2 mục cuối**. Quá hạn → escalation, không chờ im lặng |
 | 🟡 **Không chặn slice — deadline riêng** | D13 · D15 · D16 · owner risk | Slice chạy được mà không có chúng, **nhưng Wave 2 thì không** — để trễ là mượn nợ của chính mình ba tuần sau |
 
 ---
