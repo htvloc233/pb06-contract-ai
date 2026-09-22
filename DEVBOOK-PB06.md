@@ -36,6 +36,7 @@
 | DB-20 | N6 đạt — câu stack xuất sắc vòng 1; câu độ nhạy 2 vòng, PM bắt nhãn hai mặt `error_detail_ref` → ARCH v1.5 + LOCK | PM | L2 | Cổng hiểu [3] | — |
 | DB-21 | D10 lật PASS — bộ 5 HĐ synthetic + answer key; máy tự kiểm bắt HD-04 hụt trang (7→19) | AI + PM | L2 | Delegation #13 review | — |
 | DB-22 | D12 lật PASS — worker chốt option C + 4 design rule; B tự loại trong solo | PM | L2 | Quyết định N5 | — |
+| DB-23 | D9 lật PASS — egress guard sống trong CI; PM tự gửi bằng chứng post-merge (bài DB-18 tự vận hành) | PM + AI | L3 | Cổng máy DoD-4 | — |
 
 ---
 
@@ -472,6 +473,20 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 
 ---
 
+## DB-23 — D9 lật PASS: cổng egress từ giấy thành máy, và một dấu hiệu trưởng thành
+
+**AI giao (Delegation #6/#7 — L3, người review):** `src/egress_guard.py` — guard **thật, không mock**: mặc định đóng (whitelist rỗng = chặn tất cả) · chỉ https · khớp đúng host không suy subdomain · quyết định là hàm thuần không gọi mạng (test offline được) · **bị chặn thì transport không bị chạm** (chặn trước, không cản sau). Kèm 6 test + job `egress-test` đứng riêng thành check độc lập trong CI. AI tự kiểm 6/6 + ruff sạch trước khi giao.
+
+**PM thực thi:** vượt lỗi `Permission denied /Library/Python/3.8` (cài `--user`), chạy **6/6 PASS trên Python 3.8 local** — hai môi trường 3.8/3.11 cùng xanh là điểm cộng bền vững ngoài kế hoạch. Ghi sổ: máy PM dùng Python hệ thống 3.8; tới lúc build FastAPI/pdfplumber cần cài Python mới hơn.
+
+**Bằng chứng — 3 mắt xích, AI xác minh độc lập trọn vẹn:** output local (dán trong phiên) · CI run `35763287927` **Success trên `main`**, `egress-test` 8s xanh · run chính là commit **merge PR #6** ⇒ merge tự chứng minh. **Điểm đáng ghi nhất:** PM chủ động gửi *run post-merge trên main* thay vì run PR — bài học "tưởng xong" của DB-18 **tự vận hành không cần AI chặn**. Vòng trước máy giữ kỷ luật hộ người; vòng này người đã mang kỷ luật trong tay.
+
+**Hệ quả:** D9 ✅ · rủi ro **B1 (điểm 20, #1 Top-5)** chính thức có cổng máy trực trong CI · 🟠 còn duy nhất **D8 staging**. 📌 Việc treo 30 giây: thêm `egress-test` vào **Required checks** của branch protection (PM xác nhận sau).
+
+**Mức L:** `L3` — AI viết guard + test trong ranh giới, PM chạy, review và giữ toàn bộ thao tác credential/merge.
+
+---
+
 ## PM Review Log — PM rà lại từng đề xuất của AI
 
 > **Vì sao có mục này:** Dev Book gốc chỉ ghi chiều *AI-sai → PM-sửa*. Mục này ghi chiều ngược lại: **mỗi đánh giá/gợi ý của AI đều phải có phán quyết của PM** — chấp nhận, chấp nhận có chỉnh, hay bác. Chống rubber-stamping hai chiều: AI không tự đóng Done, và PM cũng không gật đầu theo quán tính. Mỗi mục DB mới = thêm một dòng. Cột *"Quyết định trong phiên"* là sự kiện đã xảy ra, AI ghi được; cột *"Xác nhận cuối"* là chữ ký của PM — **AI không được tự quyết**. *(Cột này được điền ngày 2026-09-06 theo **tuyên bố trực tiếp của PM trong phiên** — AI ghi hộ như thư ký. PM ký tay bảng này khi in hồ sơ viva.)*
@@ -500,6 +515,7 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | DB-20 | Cách chấm 2 câu cổng [3] + chốt nhãn error_detail_ref + LOCK contract | PM là reviewer: trả lời 2 câu, bắt 1 nhãn hai mặt, chấp nhận chốt Confidential + 2 design rule | ✅ Approve with fix — *phán quyết CHỦ ĐỘNG trong vai Tech Lead* | 2026-09-21 |
 | DB-21 | Bộ 5 HĐ synthetic + answer key + gen_synth.py | **PM review theo checklist §4** và duyệt: "các HĐ nháp ổn" | ✅ Duyệt — *phán quyết chủ động qua review Delegation #13* | 2026-09-22 |
 | DB-22 | DECISION-D12 (option C + 4 design rule, trigger nâng A đo được) | **PM duyệt nguyên trạng** — phán quyết trực tiếp trong phiên | ✅ Duyệt nguyên trạng | 2026-09-22 |
+| DB-23 | Egress guard + 6 test + job CI | **PM chạy local 6/6, tự đẩy PR #6, gửi bằng chứng post-merge** | ✅ Chấp nhận — *phán quyết chủ động qua thực thi + cung cấp bằng chứng đúng chuẩn* | 2026-09-22 |
 
 > ✅ **DB-01 và DB-07 đã có phán quyết chủ động** — trước 2026-09-06 hai dòng này chỉ có "không phản đối", nay được PM chấp nhận rõ ràng cùng toàn bảng. 📌 *Chuẩn bị viva:* DB-01 (chọn thang Operating Model) là quyết định nền của cả `CLAUDE.md` — Coach nhiều khả năng hỏi sâu đúng dòng này; PM nên tự trình bày lại được lý do chọn (EX-06 và bước [6] Playbook dùng thang đó) mà không cần mở tài liệu.
 
@@ -552,7 +568,8 @@ Kèm B1–B4: timeout 40s đè NFR-P2 (job scan thành công giây 55, UI báo l
 | N6 Architecture Review + contract LOCK | ✅ **PASS 2026-09-21** — PM kiêm Tech Lead qua cổng [3] có chấm (DB-20); ARCH **v1.5 Approved**, §4 **LOCKED**, D4+D5 lật theo G8 |
 | D10 synthetic + answer key | ✅ **PASS 2026-09-22** — 5 PDF máy-kiểm verbatim + mini gold set + generator tái lập; PM review duyệt (DB-21) |
 | D12 worker option | ✅ **PASS 2026-09-22** — `DECISION-D12-PB06.md` APPROVED: option C + 4 design rule (DB-22) |
-| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn 2 ô cuối:** D9 egress spike *(AI soạn test + job CI, PM chạy nửa buổi)* · D8 staging *(AI nháp docker-compose + bản quyết định, PM duyệt)*. Mỗi mục lật = một PR |
+| D9 egress spike | ✅ **PASS 2026-09-22** — guard + 6 test hai môi trường xanh; run `35763287927` Success trên main, merge PR #6 xác minh (DB-23) |
+| Vào bước [8] BUILD | 🔒 Khoá theo luật tiền-đề DOR — **🔴 sạch · 🟠 còn DUY NHẤT D8 staging** *(AI nháp docker-compose + bản quyết định kiểu D11, PM duyệt và chạy `docker compose up` lần đầu)*. Lật nốt là cửa [8] mở |
 
 ---
 
