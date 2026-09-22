@@ -1,0 +1,29 @@
+# Staging của PB-06 (chế độ solo) — định nghĩa tại DECISION-D8-PB06.md
+# Chạy: cp .env.example .env (sửa mật khẩu) -> docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: pb06
+    ports:
+      - "5432:5432"
+    volumes:
+      - pb06-dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pb06"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ai-service:
+    build: .
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pb06-dbdata:
